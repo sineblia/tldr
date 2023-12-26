@@ -6,7 +6,6 @@
 BUCKET="s3://pmc-oa-opendata/oa_comm/xml/all/"
 DESTINATION="./pmc-test/"
 
-
 # Retrieves the list of files in the AWS S3 bucket, copies the first 100 files to a specified destination,
 # and performs the copy operation without requiring a sign request.
 aws s3 ls ${BUCKET} --no-sign-request | head -100 | while read -r line; do
