@@ -3,17 +3,17 @@ import xml.etree.ElementTree as ET
 import os
 import pandas as pd
 
-"""
-    Function to extract data from XML file
-    Input: XML file
-    Output: Dataframe
-    The XML file contains the following information:
-    - article-meta: this section contains metadata on the article
-    - body: this section contains the body of the article, divided into sections ('sec')
-    - back: this section contains the references of the article
-    We need to extract informations from these sections
-"""
+import xml.etree.ElementTree as ET
 
+"""
+    Extracts data from an XML file and returns it as a dictionary.
+
+    Args:
+        file (str): The path to the XML file.
+
+    Returns:
+        dict: A dictionary containing the extracted data.
+"""
 def extract_data(file):
     # Create a dictionary to store the data
     data = {}
@@ -21,46 +21,45 @@ def extract_data(file):
     tree = ET.parse(file)
     # Get the root of the XML file
     root = tree.getroot()
-    
-    # Get the article-meta section
+
+    # Initialize abstract data
+    data['abstract'] = {}
+
+    # Initialize body data
+    data['body'] = []
+
+    # Extract title and abstract
     article_meta = root.find('.//article-meta')
-    # Get the title of the article
-    title = None
     if article_meta is not None:
         title_group = article_meta.find('title-group')
-        if title_group is not None:
-            title = title_group.find('article-title').text if title_group.find('article-title') is not None else None
-    
-    # Get the abstract of the article, considering it may have multiple sections
-    abstract = ""
-    abstract_section = article_meta.find('abstract') if article_meta is not None else None
-    if abstract_section is not None:
-        for sec in abstract_section.findall('sec'):
-            # Append each section's text to the abstract
-            sec_text = ET.tostring(sec, encoding='unicode', method='text')
-            abstract += sec_text + " "
-    
-    # Get the body of the article
-    body = ""
+        data['title'] = title_group.find('article-title').text if title_group is not None else None
+
+        abstract_section = article_meta.find('abstract')
+        if abstract_section is not None:
+            for section in abstract_section.findall('sec'):
+                section_title = section.find('title').text if section.find('title') is not None else ''
+                section_text = section.find('p').text if section.find('p') is not None else ''
+                if 'simple summary' in section_title.lower():
+                    data['abstract']['simple_summary'] = section_text
+                elif 'abstract' in section_title.lower():
+                    data['abstract']['abstract'] = section_text
+
+    # Extract body sections
     body_section = root.find('body')
     if body_section is not None:
         for sec in body_section.findall('sec'):
-            # Convert each section to string and append to the body text
-            body += ET.tostring(sec, encoding='unicode', method='text') + " "
-    
-    # Get the references of the article
-    references = []
+            section_data = {
+                'title': sec.find('title').text if sec.find('title') is not None else None,
+                'content': [p.text for p in sec.findall('p') if p.text]
+            }
+            data['body'].append(section_data)
+
+    # Extract references
     references_section = root.find('.//ref-list')
     if references_section is not None:
-        references = [ET.tostring(reference, encoding='unicode') for reference in references_section.findall('ref')]
-    
-    # Store the data into the dictionary
-    data['title'] = title
-    data['abstract'] = abstract.strip()  # Remove any leading/trailing whitespace
-    data['body'] = body.strip()  # Remove any leading/trailing whitespace
-    data['references'] = references
-    
-    # Return the dictionary
+        data['references'] = [ET.tostring(reference, encoding='unicode') for reference in references_section.findall('ref')]
+
+    # Return the extracted data
     return data
 
 # Extract data from the XML files
@@ -76,5 +75,3 @@ files = os.listdir(path)
 for file in files:
     # Extract data from the XML file
     data.append(extract_data(path + '/' + file))
-
-
