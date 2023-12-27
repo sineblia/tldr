@@ -75,3 +75,9 @@ files = os.listdir(path)
 for file in files:
     # Extract data from the XML file
     data.append(extract_data(path + '/' + file))
+
+# Convert the list of dictionaries to a Pandas DataFrame
+df = pd.DataFrame(data)
+
+# Export dataframe to JSON
+df.to_json('./data/data.json', orient='records')
