@@ -8,7 +8,7 @@ DESTINATION="./pmc-test/"
 
 # Retrieves the list of files in the AWS S3 bucket, copies the first 100 files to a specified destination,
 # and performs the copy operation without requiring a sign request.
-aws s3 ls ${BUCKET} --no-sign-request | head -100 | while read -r line; do
+aws s3 ls ${BUCKET} --no-sign-request | head -200 | while read -r line; do
    FILENAME=$(echo $line | awk '{print $4}')
    aws s3 cp ${BUCKET}${FILENAME} ${DESTINATION}${FILENAME} --no-sign-request
 done

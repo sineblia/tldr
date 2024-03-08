@@ -3,3 +3,4 @@
 data/
 model/
 pytorch_model.bin
+pmc-test/
