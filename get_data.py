@@ -26,7 +26,7 @@ collection = db[collection_name]
 
 # S3 bucket details
 BUCKET = "s3://pmc-oa-opendata/oa_comm/xml/all/"
-MAX_FILES = 100  # Max number of files to process
+MAX_FILES = 100000  # Max number of files to process
 
 # Function to process files
 def process_files():
