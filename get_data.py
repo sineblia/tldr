@@ -12,7 +12,7 @@ load_dotenv()
 # Setup MongoDB
 mongo_conn_string = os.environ['MONGO_CONN_STRING']
 db_name = os.environ['DB_NAME']
-collection_name = os.environ['COLLECTION_NAME']
+collection_name = os.environ['XML_COLLECTION']
 
 client = MongoClient(mongo_conn_string, server_api=ServerApi('1'))
 db = client[db_name]
